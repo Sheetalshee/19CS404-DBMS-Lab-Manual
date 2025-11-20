@@ -1,181 +1,281 @@
-# ER Diagram Workshop – Submission Template
-## Objective
-To understand and apply ER modeling concepts by creating ER diagrams for real-world applications.
-## Purpose
-Gain hands-on experience in designing ER diagrams that represent database structure including entities, relationships, attributes, and constraints.
+# Experiment 2: DDL Commands
+
+## AIM
+To study and implement DDL commands and different types of constraints.
+
+## THEORY
+
+### 1. CREATE
+Used to create a new relation (table).
+
+**Syntax:**
+```sql
+CREATE TABLE (
+  field_1 data_type(size),
+  field_2 data_type(size),
+  ...
+);
+```
+### 2. ALTER
+Used to add, modify, drop, or rename fields in an existing relation.
+(a) ADD
+```sql
+ALTER TABLE std ADD (Address CHAR(10));
+```
+(b) MODIFY
+```sql
+ALTER TABLE relation_name MODIFY (field_1 new_data_type(size));
+```
+(c) DROP
+```sql
+ALTER TABLE relation_name DROP COLUMN field_name;
+```
+(d) RENAME
+```sql
+ALTER TABLE relation_name RENAME COLUMN old_field_name TO new_field_name;
+```
+### 3. DROP TABLE
+Used to permanently delete the structure and data of a table.
+```sql
+DROP TABLE relation_name;
+```
+### 4. RENAME
+Used to rename an existing database object.
+```sql
+RENAME TABLE old_relation_name TO new_relation_name;
+```
+### CONSTRAINTS
+Constraints are used to specify rules for the data in a table. If there is any violation between the constraint and the data action, the action is aborted by the constraint. It can be specified when the table is created (using CREATE TABLE) or after it is created (using ALTER TABLE).
+### 1. NOT NULL
+When a column is defined as NOT NULL, it becomes mandatory to enter a value in that column.
+Syntax:
+```sql
+CREATE TABLE Table_Name (
+  column_name data_type(size) NOT NULL
+);
+```
+### 2. UNIQUE
+Ensures that values in a column are unique.
+Syntax:
+```sql
+CREATE TABLE Table_Name (
+  column_name data_type(size) UNIQUE
+);
+```
+### 3. CHECK
+Specifies a condition that each row must satisfy.
+Syntax:
+```sql
+CREATE TABLE Table_Name (
+  column_name data_type(size) CHECK (logical_expression)
+);
+```
+### 4. PRIMARY KEY
+Used to uniquely identify each record in a table.
+Properties:
+Must contain unique values.
+Cannot be null.
+Should contain minimal fields.
+Syntax:
+```sql
+CREATE TABLE Table_Name (
+  column_name data_type(size) PRIMARY KEY
+);
+```
+### 5. FOREIGN KEY
+Used to reference the primary key of another table.
+Syntax:
+```sql
+CREATE TABLE Table_Name (
+  column_name data_type(size),
+  FOREIGN KEY (column_name) REFERENCES other_table(column)
+);
+```
+### 6. DEFAULT
+Used to insert a default value into a column if no value is specified.
+
+Syntax:
+```sql
+CREATE TABLE Table_Name (
+  col_name1 data_type,
+  col_name2 data_type,
+  col_name3 data_type DEFAULT 'default_value'
+);
+```
+
+**Question 1**
+--
+--<img width="843" height="383" alt="image" src="https://github.com/user-attachments/assets/90493da9-84bd-4c41-9bcd-4dc8cd250f90" />
+
+
+```sql
+CREATE TABLE Employees
+(
+    EmployeeID INTEGER ,
+    FirstName TEXT ,
+    LastName TEXT,
+    HireDate DATE
+);
+```
+
+**Output:**
+
+<img width="1275" height="312" alt="image" src="https://github.com/user-attachments/assets/eff26862-beac-4de0-804e-3c77f9dd33eb" />
+
+
+**Question 2**
 ---
-# Scenario A: City Fitness Club Management
-**Business Context:**  
-FlexiFit Gym wants a database to manage its members, trainers, and fitness programs.
-**Requirements:**  
-- Members register with name, membership type, and start date.  
-- Each member can join multiple programs (Yoga, Zumba, Weight Training).  
-- Trainers assigned to programs; a program may have multiple trainers.  
-- Members may book personal training sessions with trainers.  
-- Attendance recorded for each session.  
-- Payments tracked for memberships and sessions.
-### ER Diagram:
-
-<img width="492" height="699" alt="image" src="https://github.com/user-attachments/assets/dec31a12-3c5c-43ef-bc6a-9d5e41a63176" />
+-- <img width="666" height="180" alt="image" src="https://github.com/user-attachments/assets/2fb1bfba-b03d-4b8a-82be-b957176a1710" />
 
 
-### Entities and Attributes
+```sql
+CREATE TABLE Bonuses
+(
+    BonusID  INTEGER PRIMARY KEY,
+    EmployeeID INTEGER,
+    BonusAmount REAL CHECK (BonusAmount>0),
+    BonusDate DATE,
+    Reason TEXT NOT NULL,
+    FOREIGN KEY (EmployeeID) REFERENCES Employees(EmployeeID)
 
-| **Entity**                      | **Attributes (PK, FK)**                                                                      | **Notes**                                                 |
-| ------------------------------- | -------------------------------------------------------------------------------------------- | --------------------------------------------------------- |
-| **Member**                      | MemberID (PK), Name, MembershipType, StartDate                                               | Stores gym members and their memberships                  |
-| **Program**                     | ProgramID (PK), ProgramName (Yoga, Zumba, Weight Training, etc.)                             | Fitness programs offered by the gym                       |
-| **Trainer**                     | TrainerID (PK), Name, Specialization                                                         | Trainers employed by the gym                              |
-| **Session (Personal Training)** | SessionID (PK), Date, Time, MemberID (FK) → Member, TrainerID (FK) → Trainer                 | Personal training sessions between a member and a trainer |
-| **Attendance**                  | AttendanceID (PK), SessionID (FK) → Session, MemberID (FK) → Member, Status (Present/Absent) | Tracks attendance for sessions                            |
-| **Payment**                     | PaymentID (PK), Date, Amount, PaymentType (Membership / Session), MemberID (FK) → Member     | Stores payments made by members                           |
-                                          |
+);
+```
 
-### Relationships and Constraints
+**Output:**
 
-| Relationship       | Cardinality             | Participation                     | Notes                                                                           |
-| ------------------ | ----------------------- | --------------------------------- | ------------------------------------------------------------------------------- |
-| Member–Program     | M\:N via MemberProgram  | Member: Partial, Program: Partial | A member can join many programs, a program can have many members                |
-| Program–Trainer    | M\:N via ProgramTrainer | Both Partial                      | A program may have multiple trainers, and trainers may handle multiple programs |
-| Member–Session     | 1\:N                    | Member: Partial, Session: Total   | A session must belong to one member, but a member can book many sessions        |
-| Trainer–Session    | 1\:N                    | Trainer: Partial, Session: Total  | A session must have one trainer, trainer may handle many sessions               |
-| Session–Attendance | 1\:N                    | Session: Total, Attendance: Total | Attendance is recorded per session per member                                   |
-| Member–Payment     | 1\:N                    | Member: Total, Payment: Total     | Payments must be tied to members                                                |
+<img width="1321" height="287" alt="image" src="https://github.com/user-attachments/assets/4175392f-177a-41e1-8a3e-f24410dd9d10" />
 
 
-### Assumptions
+**Question 3**
+---
+<img width="558" height="287" alt="image" src="https://github.com/user-attachments/assets/bc6a6f74-8725-4517-a5ce-1e9db0e8171e" />
 
-1.Each member has exactly one active membership, tracked by MembershipType and StartDate.
 
-2.A program can exist even if no members have joined it yet.
+```sql
+INSERT INTO Employee(EmployeeID, Name, Department, Salary)
+SELECT EmployeeID, Name, Department, Salary FROM  Former_employees;
+```
 
-3.A trainer can exist without being assigned to a program.
+**Output:**
 
-4.Personal training sessions are strictly one trainer ↔ one member at a time.
+<img width="1013" height="291" alt="image" src="https://github.com/user-attachments/assets/c6fd752a-64f7-422a-ae5f-0838bf6e466b" />
 
-5.Attendance is recorded only for scheduled sessions/programs, not for general gym entry.
 
-Payments are tracked for both membership renewals and personal sessions.
+**Question 4**
+---
+<img width="1153" height="262" alt="image" src="https://github.com/user-attachments/assets/477b4055-5cc6-4a81-967c-0ef101bce0e7" />
+
+
+```sql
+CREATE TABLE Department
+(
+    DepartmentID INTEGER PRIMARY KEY,
+    DepartmentName TEXT UNIQUE NOT NULL,
+    Location TEXT
+);
+```
+
+**Output:**
+
+<img width="1290" height="278" alt="image" src="https://github.com/user-attachments/assets/e4ed77da-9d9a-40cf-a641-a1851ef59b29" />
+
+**Question 5**
+---
+<img width="1048" height="326" alt="image" src="https://github.com/user-attachments/assets/4f04a0b0-06e7-47eb-a15d-ff15493d78c4" />
+
+
+```sql
+CREATE TABLE Employees
+(
+   EmployeeID INTEGER PRIMARY KEY,
+   FirstName  NOT NULL,
+   LastName NOT NULL,
+   Email UNIQUE,
+   Salary CHECK(Salary>0),
+   DepartmentID INTEGER,
+   FOREIGN KEY(DepartmentID) REFERENCES Departments(DepartmentID)
+   
+);
+```
+
+**Output:**
+
+<img width="1356" height="389" alt="image" src="https://github.com/user-attachments/assets/3b220923-aa14-4f5c-8aad-58144ffba322" />
+
+
+**Question 6**
+---
+<img width="1166" height="243" alt="image" src="https://github.com/user-attachments/assets/78d19131-4d07-4efe-948d-c2a92031112c" />
+
+```sql
+ALTER TABLE  Student_details ADD COLUMN email TEXT NOT NULL DEFAULT 'Invalid';
+
+```
+
+**Output:**
+
+<img width="1341" height="233" alt="image" src="https://github.com/user-attachments/assets/25a20ecf-bbc3-4948-a22c-af132e18c28e" />
+
+
+**Question 7**
+---
+<img width="758" height="379" alt="image" src="https://github.com/user-attachments/assets/7331a16b-c469-463a-a335-3b1f28a1d46f" />
+
+
+```sql
+INSERT INTO Books(ISBN ,Title ,Author) VALUES ('978-6655443321'  , 'Big Data Analytics' ,'Karen Adams');
+
+```
+
+**Output:**
+
+<img width="1102" height="304" alt="image" src="https://github.com/user-attachments/assets/ee9626c3-b647-4668-a8fa-0b44a88eb385" />
+
+**Question 8**
+---
+<img width="857" height="320" alt="image" src="https://github.com/user-attachments/assets/2d72ac4d-7b86-4101-b891-17ef452fd221" />
+
+
+```sql
+ALTER TABLE Student_details ADD COLUMN  ParentsNumber number;
+ALTER TABLE Student_details ADD COLUMN  Adhar_Number number;
+```
+
+**Output:**
+
+<img width="1284" height="339" alt="image" src="https://github.com/user-attachments/assets/bdf0ca26-bebd-4aa5-94a3-93428f2490f3" />
+
+
+**Question 9**
+---
+<img width="943" height="299" alt="image" src="https://github.com/user-attachments/assets/48f89433-d6cd-4d88-baeb-f5825d69d5ae" />
+
+
+```sql
+ALTER table Employees ADD COLUMN  Date_of_joining Date ;
+ALTER table Employees RENAME Column  job_title to Designation;
+```
+
+**Output:**
+
+<img width="1306" height="327" alt="image" src="https://github.com/user-attachments/assets/db2d6e91-658f-470a-85a3-6cb5c020f90d" />
+
+
+**Question 10**
 ---
 
-# Scenario B: City Library Event & Book Lending System
-
-**Business Context:**  
-The Central Library wants to manage book lending and cultural events.
-
-**Requirements:**  
-- Members borrow books, with loan and return dates tracked.  
-- Each book has title, author, and category.  
-- Library organizes events; members can register.  
-- Each event has one or more speakers/authors.  
-- Rooms are booked for events and study.  
-- Overdue fines apply for late returns.
-
-### ER Diagram:
-
-<img width="493" height="705" alt="image" src="https://github.com/user-attachments/assets/83a24ab5-b776-415c-9150-f70fa8f8a034" />
+<img width="1122" height="279" alt="image" src="https://github.com/user-attachments/assets/93bd82bd-1090-45fc-bac1-c7ce772a2ce6" />
 
 
-### Entities and Attributes
+```sql
+Insert into Books( ISBN, Title, Author, Publisher, YearPublished)
+select ISBN, Title, Author, Publisher, YearPublished from  Out_of_print_books;
+```
+
+**Output:**
+
+<img width="1319" height="249" alt="image" src="https://github.com/user-attachments/assets/3d4c2cc7-075d-4850-8f46-2bf661ba5d23" />
 
 
-| **Entity**  | **Attributes (PK, FK)**                                                                            | **Notes**                               |
-| ----------- | -------------------------------------------------------------------------------------------------- | --------------------------------------- |
-| **Member**  | MemberID (PK), Name, ContactInfo                                                                   | Stores library members                  |
-| **Book**    | BookID (PK), Title, Author, Category, AvailabilityStatus                                           | Tracks all books in the library         |
-| **Loan**    | LoanID (PK), LoanDate, DueDate, ReturnDate, FineAmount, MemberID (FK) → Member, BookID (FK) → Book | Tracks book borrowings and fines        |
-| **Event**   | EventID (PK), Title, Date, Description, RoomID (FK) → Room                                         | Stores library-organized events         |
-| **Speaker** | SpeakerID (PK), Name, Specialization                                                               | Guest speakers/authors for events       |
-| **Room**    | RoomID (PK), RoomName, Capacity, RoomType (Event / Study)                                          | Rooms can be booked for events or study |
-
-### Relationships and Constraints
-
-| Relationship    | Cardinality                | Participation                | Notes                                                                                            |
-| --------------- | -------------------------- | ---------------------------- | ------------------------------------------------------------------------------------------------ |
-| Member – Loan   | 1\:N                       | Member: Partial, Loan: Total | A member can borrow many books; each loan tied to one member                                     |
-| Book – Loan     | 1\:N                       | Book: Partial, Loan: Total   | A book can be borrowed many times but only one loan at a time                                    |
-| Member – Event  | M\:N via EventRegistration | Both Partial                 | A member can register for multiple events; an event can have many members                        |
-| Event – Speaker | M\:N via EventSpeaker      | Both Partial                 | An event can have multiple speakers; a speaker can appear in many events                         |
-| Event – Room    | 1:1                        | Event: Total, Room: Partial  | Each event must have one room; a room may be free or used by different events at different times |
-
-
-### Assumptions
-
-1.Each book is borrowed by only one member at a time.
-
-2.Fines are recorded in the Loan entity and apply only if the return date is after the due date.
-
-3.Members must exist before borrowing a book or registering for an event.
-
-4.Rooms can be used for events or study, identified by RoomType.
-
-5.A room can host only one event at a time.
-
-6.Speakers are independent entities .
-
----
-# Scenario C: Restaurant Table Reservation & Ordering
-
-**Business Context:**  
-A popular restaurant wants to manage reservations, orders, and billing.
-
-**Requirements:**  
-- Customers can reserve tables or walk in.  
-- Each reservation includes date, time, and number of guests.  
-- Customers place food orders linked to reservations.  
-- Each order contains multiple dishes; dishes belong to categories (starter, main, dessert).  
-- Bills generated per reservation, including food and service charges.  
-- Waiters assigned to serve reservations.
-
-### ER Diagram:
-
-<img width="498" height="705" alt="image" src="https://github.com/user-attachments/assets/594e5d5d-4235-4e5f-b75a-fa1426ea5d8c" />
-
-
-
-### Entities and Attributes
-
-| Entity          | Attributes (PK, FK)                                                                     | Notes                                                                  |
-| --------------- | --------------------------------------------------------------------------------------- | ---------------------------------------------------------------------- |
-| **Customer**    | CustomerID (PK), Name, ContactInfo                                                      | Customers may reserve tables or walk in                                |
-| **Reservation** | ReservationID (PK), Date, Time, NumGuests, CustomerID (FK), TableID (FK), WaiterID (FK) | Each reservation tied to a customer, a table, and served by one waiter |
-| **Table**       | TableID (PK), TableNumber, Capacity                                                     | Tracks restaurant tables                                               |
-| **Waiter**      | WaiterID (PK), Name, Shift                                                              | Each reservation assigned one waiter                                   |
-| **Order**       | OrderID (PK), ReservationID (FK), OrderTime                                             | Orders are linked to reservations                                      |
-| **OrderItem**   | OrderItemID (PK), OrderID (FK), DishID (FK), Quantity                                   | An order consists of multiple order items                              |
-| **Dish**        | DishID (PK), DishName, Price, CategoryID (FK)                                           | Menu items                                                             |
-| **Category**    | CategoryID (PK), CategoryName (Starter/Main/Dessert)                                    | Dishes grouped by category                                             |
-| **Bill**        | BillID (PK), ReservationID (FK), TotalAmount, ServiceCharge, BillDate                   | One bill per reservation                                               |
-
-
-### Relationships and Constraints
-
-| Relationship           | Cardinality | Participation                         | Notes                                                  |
-| ---------------------- | ----------- | ------------------------------------- | ------------------------------------------------------ |
-| Customer – Reservation | 1\:N        | Customer: Partial, Reservation: Total | A customer can have multiple reservations              |
-| Reservation – Table    | 1:1         | Reservation: Total, Table: Partial    | Each reservation is for one table; a table may be free |
-| Reservation – Waiter   | 1\:N        | Waiter: Partial, Reservation: Total   | A waiter serves many reservations                      |
-| Reservation – Order    | 1\:N        | Reservation: Total, Order: Total      | Every reservation may have multiple orders             |
-| Order – OrderItem      | 1\:N        | Order: Total, OrderItem: Total        | Each order has one or more items                       |
-| Dish – OrderItem       | 1\:N        | Dish: Partial, OrderItem: Total       | A dish can appear in multiple order items              |
-| Category – Dish        | 1\:N        | Category: Total, Dish: Total          | Every dish belongs to exactly one category             |
-| Reservation – Bill     | 1:1         | Reservation: Total, Bill: Total       | One bill generated per reservation                     |
-
-
-### Assumptions
-
-1.A customer must exist before making a reservation.
-
-2.Walk-in customers are recorded as reservations with immediate start time.
-
-3.Each reservation is tied to exactly one table at a given time.
-
-4.A waiter is responsible for serving a reservation (one waiter per reservation).
-
-5.A dish must belong to one category (starter, main, dessert).
-
-6.Bills are generated per reservation (not per order).
-
-7.Service charges are included in the Bill entity along with food charges.
-
----
+## RESULT
+Thus, the SQL queries to implement different types of constraints and DDL commands have been executed successfully.
